@@ -21,7 +21,7 @@ clean:
 	rm -f auth_ldap.o auth_ldap.so
 
 install: $(TARGET)
-	install -m 0644 $(TARGET) /usr/lib/mysql/plugin
+	install -m 0644 $(TARGET) /usr/local/lib/mysql/plugin
 
 api-test:
 	$(MAKE) auth_ldap.so CFLAGS+='-DAUTH_LDAP_TEST_API'
