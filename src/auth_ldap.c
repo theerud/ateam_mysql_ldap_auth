@@ -40,6 +40,7 @@
 
 config_t cfg, *cf;
 char *CONFIG_LDAP_URI = NULL;
+char *CONFIG_CACERT_FILE = NULL;
 char *CONFIG_BIND_DN = NULL;
 char *CONFIG_BIND_PW = NULL;
 char *CONFIG_SEARCH_FILTER = NULL;
@@ -361,6 +362,18 @@ static int ldap_auth_server(MYSQL_PLUGIN_VIO *vio, MYSQL_SERVER_AUTH_INFO *myInf
 		(*ldap_unbind_ext_wrapper)( ld, NULL, NULL );
 		return CR_ERROR;
 	}
+
+#ifdef DEBUG
+	fprintf(stderr,"ldap_auth_server: setting LDAP_OPT_X_TLS_CACERTFILE\n" );
+#endif
+	//char *certfile_path="/etc/ssl/ldap/ca.crt";
+	status = (*ldap_set_option_wrapper)( ld, LDAP_OPT_X_TLS_CACERTFILE, (void *)CONFIG_CACERT_FILE);
+	if( status != LDAP_OPT_SUCCESS ){
+		fprintf(stderr, "ldap_auth_server: cannot set LDAP_OPT_X_TLS_CACERTFILE\n" );
+		(*ldap_unbind_ext_wrapper)( ld, NULL, NULL );
+		return CR_ERROR;
+	}
+
 	//char *username = strdup(myInfo->user_name);
 	//size_t usernameSize = strlen(username);
 
@@ -489,6 +502,7 @@ static int init(void* omited){
 	// read config file
 	const char *_CONFIG_LDAP_URI = NULL;
 	const char *_CONFIG_DN = NULL;
+	const char *_CONFIG_CACERT_FILE = NULL;
 	const char *_CONFIG_BIND_DN = NULL;
 	const char *_CONFIG_BIND_PW = NULL;
 	const char *_CONFIG_SEARCH_FILTER = NULL;
@@ -512,6 +526,14 @@ static int init(void* omited){
 	}
 	else
 		fprintf(stderr, "ldap.uri is not defined (e.g. ldap://localhost:389)\n");
+
+	if (config_lookup_string(cf, "ldap.cacert_file", &_CONFIG_CACERT_FILE))
+	{
+		CONFIG_CACERT_FILE = strdup(_CONFIG_CACERT_FILE);
+		fprintf(stderr,"ldap.cacert_file = %s\n", CONFIG_CACERT_FILE);
+	}
+	else
+		fprintf(stderr, "ldap.cacert_file is not defined (e.g. /etc/ssl/ldap/ca.crt)\n");
 
 	if (config_lookup_string(cf, "ldap.bind_dn", &_CONFIG_BIND_DN))
 	{
