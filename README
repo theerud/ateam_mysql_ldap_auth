@@ -3,7 +3,7 @@ WWW: https://github.com/ateamsystems/ateam_mysql_ldap_auth
 --------------------------------------------------------------------------- -
 
 A-Team MySQL LDAP Authenticator (ateam_mysql_ldap_auth) is an authentication
-plugin for MySQL 5.1 and up, and has been extensively tested with MySQL 5.6
+plugin for MySQL 5.5.7 and up, and has been extensively tested with 5.6
 under FreeBSD but should work fine under Linux as well with a few tweaks,
 patches are welcome!
 
