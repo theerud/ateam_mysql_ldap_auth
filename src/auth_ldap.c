@@ -53,17 +53,17 @@ const char *CONFIG_LIBLDAP = NULL;
 /* Logging functions */
 static void openSysLog(void);
 static char* vmkString(const char* format,int *size, va_list ap);
-static void error(const char* err, ... );
-static void info(const char* message, ... );
+static void error(const char* err, ...);
+static void info(const char* message, ...);
 
 /* openLDAP wrapper functions */
-static int ldap_initialize_wrapper(LDAP**, char* );
-static int ldap_set_option_wrapper(LDAP*,int, const void* );
-static int ldap_unbind_ext_wrapper(LDAP*, LDAPControl*[], LDAPControl*[] );
+static int ldap_initialize_wrapper(LDAP**, char*);
+static int ldap_set_option_wrapper(LDAP*,int, const void*);
+static int ldap_unbind_ext_wrapper(LDAP*, LDAPControl*[], LDAPControl*[]);
 static int ldap_sasl_bind_s_wrapper(LDAP*, const char*, const char*,
-    struct berval*, LDAPControl*[], LDAPControl*[], struct berval** );
+    struct berval*, LDAPControl*[], LDAPControl*[], struct berval**);
 static struct berval* ber_str2bv_wrapper(const char*, ber_len_t, int,
-    struct berval*); 
+    struct berval*);
 static int ldap_search_s_wrapper(LDAP *, char *, int, char *, char *[], int,
     LDAPMessage **);
 static int ldap_msgfree_wrapper(LDAPMessage *);
@@ -110,7 +110,7 @@ openSysLog(void)
 {
 
 	if (syslog_open)
-	    return;
+		return;
 
 	openlog("mysql-auth_ldap", LOG_PID, LOG_DAEMON);
 	syslog_open = 1;
@@ -262,10 +262,11 @@ ldap_search_s_wrapper(LDAP *ld, char *base, int scope, char *filter,
 {
 
 #ifdef AUTH_LDAP_TEST_API
-	return (ldap_search_s(ld, base, scope, filter, attrs, attrsonly, res));
+	return (ldap_search_s(ld, base, scope, filter, attrs,
+	    attrsonly, res));
 #else
-	return ((*ldap_search_s_p)(ld, base, scope, filter, attrs, attrsonly,
-	    res));
+	return ((*ldap_search_s_p)(ld, base, scope, filter, attrs,
+	    attrsonly, res));
 #endif
 }
 
