@@ -27,6 +27,7 @@
 /* OS specific includes */
 #include <dlfcn.h>
 #include <syslog.h>
+#include <sys/types.h>
 
 /* MySQL specific includes */
 #include <mysql/mysql.h>
@@ -70,8 +71,8 @@ static int ldap_sasl_bind_s_wrapper(LDAP*, const char*, const char*,
     struct berval*, LDAPControl*[], LDAPControl*[], struct berval**);
 static struct berval* ber_str2bv_wrapper(const char*, ber_len_t, int,
     struct berval*);
-static int ldap_search_s_wrapper(LDAP *, char *, int, char *, char *[], int,
-    LDAPMessage **);
+static int ldap_search_ext_s_wrapper(LDAP *, char *, int, char *, char *[], int,
+    LDAPControl **, LDAPControl **, struct timeval *, int, LDAPMessage **);
 static int ldap_msgfree_wrapper(LDAPMessage *);
 
 /* Function pointers to ldap functions typedefs */
@@ -82,8 +83,8 @@ typedef int (*ldap_sasl_bind_s_t)(LDAP*, const char*, const char*,
     struct berval*, LDAPControl*[], LDAPControl*[], struct berval**);
 typedef struct berval* (*ber_str2bv_t)(const char*, ber_len_t, int,
     struct berval*);
-typedef int (*ldap_search_s_t)(LDAP *, char *, int, char *, char *[], int,
-    LDAPMessage **);
+typedef int (*ldap_search_ext_s_t)(LDAP *, char *, int, char *, char *[], int,
+    LDAPControl **, LDAPControl **, struct timeval *, int, LDAPMessage **);
 typedef int (*ldap_msgfree_t)(LDAPMessage *);
 
 /*
@@ -95,7 +96,7 @@ static ldap_set_option_t ldap_set_option_p;
 static ldap_unbind_ext_t ldap_unbind_ext_p;
 static ldap_sasl_bind_s_t ldap_sasl_bind_s_p;
 static ber_str2bv_t ber_str2bv_p;
-static ldap_search_s_t ldap_search_s_p;
+static ldap_search_ext_s_t ldap_search_ext_s_p;
 static ldap_msgfree_t ldap_msgfree_p;
 static LDAPMessage* (*ldap_first_entry_p)(LDAP *, LDAPMessage *);
 static LDAPMessage* (*ldap_next_entry_p)(LDAP *, LDAPMessage *);
@@ -262,16 +263,18 @@ vmkString(const char* format, int *size, va_list ap)
 }
 
 static int
-ldap_search_s_wrapper(LDAP *ld, char *base, int scope, char *filter,
-    char *attrs[], int attrsonly, LDAPMessage **res)
+ldap_search_ext_s_wrapper(LDAP *ld, char *base, int scope, char *filter,
+    char *attrs[], int attrsonly, LDAPControl **serverctrls,
+    LDAPControl **clientctrls, struct timeval *timeout, int sizelimit,
+    LDAPMessage **res)
 {
 
 #ifdef AUTH_LDAP_TEST_API
-	return (ldap_search_s(ld, base, scope, filter, attrs,
-	    attrsonly, res));
+	return (ldap_search_ext_s(ld, base, scope, filter, attrs,
+	    attrsonly, serverctrls, clientctrls, timeout, sizelimit, res));
 #else
-	return ((*ldap_search_s_p)(ld, base, scope, filter, attrs,
-	    attrsonly, res));
+	return ((*ldap_search_ext_s_p)(ld, base, scope, filter, attrs,
+	    attrsonly, serverctrls, clientctrls, timeout, sizelimit, res));
 #endif
 }
 
@@ -463,8 +466,8 @@ ldap_auth_server(MYSQL_PLUGIN_VIO *vio, MYSQL_SERVER_AUTH_INFO *myInfo)
 	} else {
 		log_message(LOG_DEBUG, "initial bind succeeded");
 		/* Do the LDAP search. */
-		status = (*ldap_search_s_wrapper)(ld, CONFIG_DN, scope,
-		    CONFIG_SEARCH_FILTER, NULL, attrsonly, &answer);
+		status = (*ldap_search_ext_s_wrapper)(ld, CONFIG_DN, scope,
+		    CONFIG_SEARCH_FILTER, NULL, attrsonly, NULL, NULL, NULL, 0, &answer);
 		    /* CONFIG_SEARCH_FILTER, attrs, attrsonly, &answer); */
 
 		if (status != LDAP_SUCCESS) {
@@ -674,9 +677,9 @@ init(void* omited)
 		log_message(LOG_ERR, "cannot load symbol: ber_bvfree");
 		return (EXIT_FAILURE);
 	}
-	void *search = dlsym(handle, "ldap_search_s");
+	void *search = dlsym(handle, "ldap_search_ext_s");
 	if (search == NULL) {
-		log_message(LOG_ERR, "cannot load symbol: ldap_search_s");
+		log_message(LOG_ERR, "cannot load symbol: ldap_search_ext_s");
 		return (EXIT_FAILURE);
 	}
 	void *first_entry = dlsym(handle, "ldap_first_entry");
@@ -715,7 +718,7 @@ init(void* omited)
 	ldap_unbind_ext_p = (ldap_unbind_ext_t)unbind;
 	ldap_sasl_bind_s_p = (ldap_sasl_bind_s_t)bind;
 	ber_str2bv_p = (ber_str2bv_t)ber;
-	ldap_search_s_p = (ldap_search_s_t)search;
+	ldap_search_ext_s_p = (ldap_search_ext_s_t)search;
 	ldap_msgfree_p = (ldap_msgfree_t)msgfree;
 
 	ldap_first_entry_p =
