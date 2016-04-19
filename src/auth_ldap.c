@@ -45,7 +45,7 @@ char *CONFIG_CACERT_FILE = NULL;
 char *CONFIG_BIND_DN = NULL;
 char *CONFIG_BIND_PW = NULL;
 char *CONFIG_SEARCH_FILTER = NULL;
-char *CONFIG_DN = NULL;
+char *CONFIG_USER_BASE = NULL;
 const char *CONFIG_LIBLDAP = NULL;
 
 /* For debug, uncomment */
@@ -466,7 +466,7 @@ ldap_auth_server(MYSQL_PLUGIN_VIO *vio, MYSQL_SERVER_AUTH_INFO *myInfo)
 	} else {
 		log_message(LOG_DEBUG, "initial bind succeeded");
 		/* Do the LDAP search. */
-		status = (*ldap_search_ext_s_wrapper)(ld, CONFIG_DN, scope,
+		status = (*ldap_search_ext_s_wrapper)(ld, CONFIG_USER_BASE, scope,
 		    CONFIG_SEARCH_FILTER, NULL, attrsonly, NULL, NULL, NULL, 0, &answer);
 		    /* CONFIG_SEARCH_FILTER, attrs, attrsonly, &answer); */
 
@@ -559,7 +559,7 @@ init(void* omited)
 {
 	/* config variables */
 	const char *_CONFIG_LDAP_URI = NULL;
-	const char *_CONFIG_DN = NULL;
+	const char *_CONFIG_USER_BASE = NULL;
 	const char *_CONFIG_CACERT_FILE = NULL;
 	const char *_CONFIG_BIND_DN = NULL;
 	const char *_CONFIG_BIND_PW = NULL;
@@ -622,11 +622,11 @@ init(void* omited)
 		    "(e.g. (objectClass=inetOrgPerson))");
 		return (EXIT_FAILURE);
 	}
-	if (config_lookup_string(cf, "ldap.dn", &_CONFIG_DN)) {
-		CONFIG_DN = strdup(_CONFIG_DN);
-		log_message(LOG_DEBUG, "ldap.dn = %s", CONFIG_DN);
+	if (config_lookup_string(cf, "ldap.user_base", &_CONFIG_USER_BASE)) {
+		CONFIG_USER_BASE = strdup(_CONFIG_USER_BASE);
+		log_message(LOG_DEBUG, "ldap.user_base = %s", CONFIG_USER_BASE);
 	} else {
-		log_message(LOG_ERR, "ldap.dn is not defined "
+		log_message(LOG_ERR, "ldap.user_base is not defined "
 		    "(e.g. ou=People,dc=example,dc=com)");
 		return (EXIT_FAILURE);
 	}
@@ -755,7 +755,7 @@ deinit(void* omited)
 	free(CONFIG_BIND_PW);
 	free(CONFIG_BIND_DN);
 	free(CONFIG_LDAP_URI);
-	free(CONFIG_DN);
+	free(CONFIG_USER_BASE);
 	config_destroy(cf);
 
 	return (0);
