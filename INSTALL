@@ -17,13 +17,15 @@ file. Sample config file can be like following:
 
 ldap:
 {
-	uri           = "ldaps://sample_ldap_server";
-	dn            = "dc=sample_company,dc=com";
-	cacert_file   = "/etc/ssl/ldap/ca.crt";
-	bind_dn       = "uid=sample_user,dc=System,dc=sample_company,dc=com";
-	bind_pw       = "sample_password";
-	search_filter = "(objectClass=inetOrgPerson)";
-	libldap       = "/usr/local/lib/libldap.so";
+        uri             = "ldaps://sample_ldap_server";
+        user_base       = "dc=sample_company,dc=com";
+        cacert_file     = "/etc/ssl/ldap/ca.crt";
+        bind_dn         = "uid=sample_user,dc=System,dc=sample_company,dc=com";
+        bind_pw         = "sample_password";
+        login_attribute = "uid";
+        search_filter   = "(objectClass=inetOrgPerson)";
+        libldap         = "/usr/local/lib/libldap.so";
+        log_level       = "normal";     # can be "normal" or "debug"
 }
 
 All config variables are required to set.
@@ -55,9 +57,9 @@ For more information regarding the URI please check the ldap_initialize
 function man page:
 http://linux.die.net/man/3/ldap_initialize
 
-= dn =
+= user_base =
 
-The LDAP server base DN.
+User searches are started in this DN.
 
 = cacert_file =
 
@@ -71,15 +73,59 @@ Low privileged user DN to login first and search through LDAP directories.
 
 Low privileged user password.
 
+= login_attribute =
+
+The login attribute/prefix used for user accounts, typically "uid" or "cn" for
+OpenLDAP and "sAMAccountName" for Active Directory.
+
 = search_filter =
 
 LDAP search filter. It can be like "(objectClass=inetOrgPerson)".
+
+If your directory schema supports group of name membership mapping to accounts
+(in OpenLDAP this is achieved via the memberof schema) you can filter by group
+as well, for example:
+
+"(&(memberOf=cn=MySQL Users,dc=Groups,dc=sample_company,dc=com)(objectClass=inetOrgPerson))";
 
 = libldap =
 
 The location of the OpenLDAP dynamic library (.so). Failing to provide
 the plugin with a correct path will led to errors during loading and a
 non functional plugin. Please, provide a full path to the library.
+
+[ Client Setup ]
+
+Just like MySQL Enterprise's PAM module, this plugin uses the clear_text
+password client module.  This is because the LDAP server itself must
+perform the password hashing and comparison.  This is in contrast to the
+default mechanism where the client sends only the hash to the MySQL server,
+where it is compared.  This has limited security value but it does prevent
+someone from learning the actual password if no SSL is used.  With the
+clear_text plugin this is not the case.  Hence the following warning:
+
+!!! IMPORTANT:
+!!! ------------------------------------------------------------------------
+!!! ENSURE THE COMMUNICATIONS PATH BETWEEN THE CLIENT AND SERVER IS SECURE!
+!!! ------------------------------------------------------------------------
+!!! By default MySQL does not use SSL so additional steps and network design
+!!! are needed to ensure you're not exposing your credentials.
+
+= MySQL Command Line Tools =
+
+For command line clients this is done by setting the following environment
+variable:
+
+  export LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN=1
+  
+Failure to do this will result in an error such as this:
+
+ERROR 2059 (HY000): Authentication plugin 'mysql_clear_password' cannot be loaded: plugin not enabled
+
+= MySQL Workbench =
+
+In MySQL Workbench this is acheived by going to go to the "Advanced" tab and
+checking "Enable Cleartext Authentication Plugin" when editing a connction.
 
 [ Compiling ]
 
