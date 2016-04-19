@@ -467,8 +467,9 @@ ldap_auth_server(MYSQL_PLUGIN_VIO *vio, MYSQL_SERVER_AUTH_INFO *myInfo)
 	} else {
 		log_message(LOG_DEBUG, "initial bind succeeded");
 		/* Do the LDAP search. */
-		status = (*ldap_search_ext_s_wrapper)(ld, CONFIG_USER_BASE, scope,
-		    CONFIG_SEARCH_FILTER, NULL, attrsonly, NULL, NULL, NULL, 0, &answer);
+		status = (*ldap_search_ext_s_wrapper)(ld, CONFIG_USER_BASE,
+		    scope, CONFIG_SEARCH_FILTER, NULL, attrsonly, NULL, NULL,
+		    NULL, 0, &answer);
 		    /* CONFIG_SEARCH_FILTER, attrs, attrsonly, &answer); */
 
 		if (status != LDAP_SUCCESS) {
@@ -514,7 +515,8 @@ ldap_auth_server(MYSQL_PLUGIN_VIO *vio, MYSQL_SERVER_AUTH_INFO *myInfo)
 					    "on credentials");
 					(*ldap_memfree_p)(dn);
 					(*ldap_msgfree_wrapper)(answer);
-					(*ldap_unbind_ext_wrapper)(ld, NULL, NULL);
+					(*ldap_unbind_ext_wrapper)(ld, NULL,
+					    NULL);
 					return (CR_ERROR);
 				}
 				log_message(LOG_DEBUG, "preparing to bind as "
@@ -575,7 +577,8 @@ init(void* omited)
 	cf = &cfg;
 	config_init(cf);
 
-	if (!config_read_file(cf, "/usr/local/etc/ateam_mysql_ldap_auth.conf")) {
+	if (!config_read_file(cf,
+	    "/usr/local/etc/ateam_mysql_ldap_auth.conf")) {
 		log_message(LOG_ERR, "%s:%d - %s",
 		    config_error_file(cf),
 		    config_error_line(cf),
@@ -592,7 +595,8 @@ init(void* omited)
 		    "(e.g. ldap:/*localhost:389)");
 		return (EXIT_FAILURE);
 	}
-	if (config_lookup_string(cf, "ldap.cacert_file", &_CONFIG_CACERT_FILE)) {
+	if (config_lookup_string(cf, "ldap.cacert_file",
+	    &_CONFIG_CACERT_FILE)) {
 		CONFIG_CACERT_FILE = strdup(_CONFIG_CACERT_FILE);
 		log_message(LOG_DEBUG, "ldap.cacert_file = %s",
 		    CONFIG_CACERT_FILE);
