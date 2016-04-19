@@ -571,7 +571,7 @@ init(void* omited)
 	cf = &cfg;
 	config_init(cf);
 
-	if (!config_read_file(cf, "/usr/local/etc/mysql-auth_ldap.cfg")) {
+	if (!config_read_file(cf, "/usr/local/etc/ateam_mysql_ldap_auth.conf")) {
 		log_message(LOG_ERR, "%s:%d - %s",
 		    config_error_file(cf),
 		    config_error_line(cf),
