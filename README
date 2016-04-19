@@ -23,7 +23,7 @@ directory.
 
 Just like MySQL Enterprise's PAM module, for client side authentication
 this plugin uses the clear_text password module as the LDAP server must
-perform the password hasing and comparison.  For command line client this
+perform the password hasing and comparison.  For command line clients this
 is done by setting the following environment variable:
 
   export LIBMYSQL_ENABLE_CLEARTEXT_PLUGIN=1
@@ -35,8 +35,8 @@ checking "Enable Cleartext Authentication Plugin" when editing a connction.
 !!! ------------------------------------------------------------------------
 !!! ENSURE THE COMMUNICATIONS PATH BETWEEN THE CLIENT AND SERVER IS SECURE!
 !!! ------------------------------------------------------------------------
-!!! By default MySQL does not use SSL so additional steps and network design are
-!!! needed to ensure you're not exposing your credetials.
+!!! By default MySQL does not use SSL so additional steps and network design
+!!! are needed to ensure you're not exposing your credetials.
 
 This is a fork of the fork of original mysql-auth_ldap project:
 http://sourceforge.net/projects/mysqlauthldap/
