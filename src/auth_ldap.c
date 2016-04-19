@@ -45,6 +45,7 @@ char *CONFIG_CACERT_FILE = NULL;
 char *CONFIG_BIND_DN = NULL;
 char *CONFIG_BIND_PW = NULL;
 char *CONFIG_SEARCH_FILTER = NULL;
+char *CONFIG_LOGIN_ATTRIBUTE = NULL;
 char *CONFIG_USER_BASE = NULL;
 const char *CONFIG_LIBLDAP = NULL;
 
@@ -481,14 +482,16 @@ ldap_auth_server(MYSQL_PLUGIN_VIO *vio, MYSQL_SERVER_AUTH_INFO *myInfo)
 		char *dn;
 
 		/* uid string, like 'uid=george,' */
-		int len = strlen(myInfo->user_name) + 6;
+		int len = strlen(myInfo->user_name) +
+		    strlen(CONFIG_LOGIN_ATTRIBUTE) + 3;
 		char *uid_str = (char *)malloc(sizeof(char) * len);
 		if (uid_str == NULL) {
 			log_message(LOG_ERR, "malloc error creating uid_str");
 			(*ldap_unbind_ext_wrapper)(ld, NULL, NULL);
 			return (CR_ERROR);
 		}
-		snprintf(uid_str, len, "uid=%s,", myInfo->user_name);
+		snprintf(uid_str, len, "%s=%s,", CONFIG_LOGIN_ATTRIBUTE,
+		    myInfo->user_name);
 		log_message(LOG_DEBUG, "searching for uid string: %s\n",
 		    uid_str);
 		/* Cycle through all objects returned with our search */
@@ -564,6 +567,7 @@ init(void* omited)
 	const char *_CONFIG_BIND_DN = NULL;
 	const char *_CONFIG_BIND_PW = NULL;
 	const char *_CONFIG_SEARCH_FILTER = NULL;
+	const char *_CONFIG_LOGIN_ATTRIBUTE = NULL;
 
 	log_message(LOG_INFO, "loading module ateam_mysql_ldap_auth "
 	    "(log level %i)", log_level);
@@ -628,6 +632,16 @@ init(void* omited)
 	} else {
 		log_message(LOG_ERR, "ldap.user_base is not defined "
 		    "(e.g. ou=People,dc=example,dc=com)");
+		return (EXIT_FAILURE);
+	}
+	if (config_lookup_string(cf, "ldap.login_attribute",
+	    &_CONFIG_LOGIN_ATTRIBUTE)) {
+		CONFIG_LOGIN_ATTRIBUTE = strdup(_CONFIG_LOGIN_ATTRIBUTE);
+		log_message(LOG_DEBUG, "ldap.login_attribute = %s",
+		    CONFIG_LOGIN_ATTRIBUTE);
+	} else {
+		log_message(LOG_ERR, "ldap.login_attribute is not defined "
+		    "(e.g. uid=");
 		return (EXIT_FAILURE);
 	}
 	if (config_lookup_string(cf, "ldap.libldap", &CONFIG_LIBLDAP))
@@ -751,6 +765,7 @@ deinit(void* omited)
 		log_message(LOG_DEBUG, "closing syslog, bye!");
 		closelog();
 	}
+	free(CONFIG_LOGIN_ATTRIBUTE);
 	free(CONFIG_SEARCH_FILTER);
 	free(CONFIG_BIND_PW);
 	free(CONFIG_BIND_DN);
