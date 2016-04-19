@@ -1,22 +1,12 @@
 /***************************************************************************
- *   Copyright (C) 2012 by Infoscope Hellas. All rights reserved.          *
- *   Authors: Charalampos Serenis,                                         *
- *   serenis@dev.infoscope.gr                                              *
+ *   Portions copyright (c) 2016 by A-Team Productions, LLC. All rights    *
+ *   reserved.   http://www.ateamsystems.com                               *
  *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
+ *   Based on mysql-auth_ldap https://github.com/mike1703/mysql-auth_ldap  *
+ *   Copyright (c) 2012 by Infoscope Hellas. All rights reserved.          *
+ *   Authors: Charalampos Serenis, serenis@dev.infoscope.gr                *
  *                                                                         *
- *   This program is distributed in the hope that it will be useful,       *
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
- *   GNU General Public License for more details.                          *
- *                                                                         *
- *   You should have received a copy of the GNU General Public License     *
- *   along with this program; if not, write to the                         *
- *   Free Software Foundation, Inc.,                                       *
- *   51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.               *
+ *   See the LICENSE, COPYRIGHT and AUTHORS files for license details      *
  ***************************************************************************/
 
 /* Standard C includes */

@@ -1,3 +1,7 @@
+Portions copyright (c) 2016 by A-Team Productions, LLC
+http://www.ateamsystems.com
+
+Base on mysql-auth_ldap https://github.com/mike1703/mysql-auth_ldap
 Copyright (C) 2012 by Infoscope Hellas, L.P.  <info@dev.infoscope.gr>
 
 This program is free software; you can redistribute it and/or modify
