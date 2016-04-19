@@ -47,17 +47,10 @@ char *CONFIG_BIND_PW = NULL;
 char *CONFIG_SEARCH_FILTER = NULL;
 char *CONFIG_LOGIN_ATTRIBUTE = NULL;
 char *CONFIG_USER_BASE = NULL;
+const char *CONFIG_LOG_LEVEL = NULL;
 const char *CONFIG_LIBLDAP = NULL;
 
-/* For debug, uncomment */
-/* #define	DEBUG	1 */
-
-/* This should be moved to the config file */
-#ifdef DEBUG
-int log_level = LOG_DEBUG;
-#else
 int log_level = LOG_INFO;
-#endif
 
 /* Logging functions */
 static void openSysLog(void);
@@ -647,6 +640,18 @@ init(void* omited)
 		log_message(LOG_ERR, "ldap.login_attribute is not defined "
 		    "(e.g. uid=");
 		return (EXIT_FAILURE);
+	}
+	if (config_lookup_string(cf, "ldap.log_level",
+	    &CONFIG_LOG_LEVEL)) {
+		if (strcmp(CONFIG_LOG_LEVEL, "debug") == 0)
+			log_level = LOG_DEBUG;
+		else
+			log_level = LOG_INFO;
+		log_message(LOG_DEBUG, "ldap.log_level = %s",
+		    CONFIG_LOG_LEVEL);
+	} else {
+		log_message(LOG_ERR, "ldap.log_level is not defined "
+		    "(e.g. normal or debug");
 	}
 	if (config_lookup_string(cf, "ldap.libldap", &CONFIG_LIBLDAP))
 		log_message(LOG_DEBUG, "ldap.libldap = %s", CONFIG_LIBLDAP);
