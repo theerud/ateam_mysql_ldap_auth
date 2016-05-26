@@ -1,12 +1,10 @@
 [ Prerequisities ]
 
-auth_ldap is an authentication module for MySQL 5. Plugable
-authentication is supported by MySQL from version 5.5.7 and up. Any
-attempt to compile this module against MySQL source code older than that
-will fail. Furthermore, in order to support LDAP connectivity the plugin
-requires OpenLDAP library dynamically compiled. The plugin was tested to
-compile against openldap-client-2.4.44 and libconfig-1.4.9_1.
-It is unknown if it compiles with older versions.
+A-Team MySQL LDAP Auth is an authentication plugin module for MySQL
+5.5.7 and up. Compiling against previous MySQL source code will fail.
+
+This plugin requires the OpenLDAP library .so shared object.
+
 This install guide is assuming you are using FreeBSD. It should also 
 work for Linux too with some minor modifications.
 
@@ -29,7 +27,7 @@ ldap:
 }
 
 All config variables are required to set.
-The config file name should be /usr/local/etc/mysql-auth_ldap.cfg.
+The config file name should be /usr/local/etc/ateam_mysql_ldap_auth.conf
 
 = uri =
 
