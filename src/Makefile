@@ -1,6 +1,6 @@
 TARGET=auth_ldap.so
 CC=cc
-INCLUDES=`mysql_config --cflags` -fPIC -DMYSQL_DYNAMIC_PLUGIN
+INCLUDES=`mysql_config --cflags` -I/usr/local/include -fPIC -DMYSQL_DYNAMIC_PLUGIN
 CFLAGS=
 CPPFLAGS=
 LDFLAGS=-L/usr/local/lib

@@ -19,9 +19,11 @@
 #include <syslog.h>
 #include <sys/types.h>
 
+#define MYSQL_ABI_CHECK
+
 /* MySQL specific includes */
-#include <mysql/mysql.h>
-#include <mysql/my_global.h>
+#include <mysql.h>
+#include <my_global.h>
 #include <mysql/plugin_auth.h>
 #include <mysql/client_plugin.h>
 
