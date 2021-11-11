@@ -31,6 +31,8 @@
 #include <ldap.h>
 #include <libconfig.h>
 
+#define LDAP_AUTH_PLUGIN_CONFIG_FILE "/usr/local/etc/ateam_mysql_ldap_auth.conf"
+
 config_t cfg, *cf;
 char *CONFIG_LDAP_URI = NULL;
 char *CONFIG_CACERT_FILE = NULL;
@@ -562,10 +564,9 @@ init(void* omited)
 	cf = &cfg;
 	config_init(cf);
 
-	if (!config_read_file(cf,
-	    "/usr/local/etc/ateam_mysql_ldap_auth.conf")) {
+	if (!config_read_file(cf, LDAP_AUTH_PLUGIN_CONFIG_FILE)) {
 		log_message(LOG_ERR, "%s:%d - %s",
-		    config_error_file(cf),
+		    LDAP_AUTH_PLUGIN_CONFIG_FILE,
 		    config_error_line(cf),
 		    config_error_text(cf));
 		config_destroy(cf);
