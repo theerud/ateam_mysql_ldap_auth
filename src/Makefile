@@ -4,6 +4,7 @@ INCLUDES=`mysql_config --cflags` -I/usr/local/include -fPIC -DMYSQL_DYNAMIC_PLUG
 CFLAGS=
 CPPFLAGS=
 LDFLAGS=-L/usr/local/lib
+INSTALL_DIR=`mysql_config --variable=plugindir`
 
 .PHONY: all clean api-test
 
@@ -22,7 +23,7 @@ clean:
 	rm -f auth_ldap.o auth_ldap.so
 
 install: $(TARGET)
-	install -m 0644 $(TARGET) /usr/local/lib/mysql/plugin
+	install -m 0644 $(TARGET) $(INSTALL_DIR)
 
 api-test:
 	$(MAKE) auth_ldap.so CFLAGS+='-DAUTH_LDAP_TEST_API'
